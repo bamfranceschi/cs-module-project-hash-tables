@@ -2,6 +2,7 @@ class HashTableEntry:
     """
     Linked List hash table key/value pair
     """
+
     def __init__(self, key, value):
         self.key = key
         self.value = value
@@ -22,7 +23,8 @@ class HashTable:
 
     def __init__(self, capacity):
         # Your code here
-
+        self.hash_table = [None]*capacity
+        self.capacity = capacity
 
     def get_num_slots(self):
         """
@@ -36,7 +38,6 @@ class HashTable:
         """
         # Your code here
 
-
     def get_load_factor(self):
         """
         Return the load factor for this hash table.
@@ -45,16 +46,26 @@ class HashTable:
         """
         # Your code here
 
-
     def fnv1(self, key):
         """
         FNV-1 Hash, 64-bit
 
         Implement this, and/or DJB2.
         """
+        #en_key = key.encode
 
-        # Your code here
+        # hash = offset_basis
+        hash = 14695981039346656037
+        # for each byte_of_data to be hashed
+        for k in key:
 
+            o = ord(k)
+            #hash = hash * FNV_prime
+            hash = hash * 1099511628211
+            # hash = hash xor byte_of_data
+            hash = hash ^ o
+        # return hash
+        return hash
 
     def djb2(self, key):
         """
@@ -62,16 +73,22 @@ class HashTable:
 
         Implement this, and/or FNV-1.
         """
-        # Your code here
+        hash = 5381
 
+        for k in key:
+            hash = ((hash << 5) + hash) + ord(k)
+
+        return hash
 
     def hash_index(self, key):
         """
         Take an arbitrary key and return a valid integer index
         between within the storage capacity of the hash table.
         """
-        #return self.fnv1(key) % self.capacity
-        return self.djb2(key) % self.capacity
+        hash_key = self.fnv1(key)
+
+        return hash_key % self.capacity
+        # return self.djb2(key) % self.capacity
 
     def put(self, key, value):
         """
@@ -83,6 +100,11 @@ class HashTable:
         """
         # Your code here
 
+        # get the hash_index
+        # insert value at hash_index
+        hash_key = self.hash_index(key)
+
+        self.hash_table[hash_key] = value
 
     def delete(self, key):
         """
@@ -93,7 +115,10 @@ class HashTable:
         Implement this.
         """
         # Your code here
-
+        # compute hash index
+        # set value to None where hash index
+        curr_idx = self.hash_index(key)
+        self.hash_table[curr_idx] = None
 
     def get(self, key):
         """
@@ -104,7 +129,10 @@ class HashTable:
         Implement this.
         """
         # Your code here
-
+        # compute current hash_index
+        # retrieve value stored there
+        curr_idx = self.hash_index(key)
+        return self.hash_table[curr_idx]
 
     def resize(self, new_capacity):
         """
@@ -114,7 +142,6 @@ class HashTable:
         Implement this.
         """
         # Your code here
-
 
 
 if __name__ == "__main__":
